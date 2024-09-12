@@ -18,3 +18,10 @@ ignition/deployments/chain-31337
 
 package-lock.json
 
+
+
+# testing
+/*/coverage
+
+# production
+/*/build
