@@ -10,6 +10,7 @@ const Constants = require('./constants').Constants;
 const properties = require('./properties.json');
 const cors = require('cors')
 
+
 const numCPUs = os.cpus().length > 5 ? os.cpus().length - 4 : os.cpus().length;
 cluster.schedulingPolicy = cluster.SCHED_RR;
 const corsOptions = {
@@ -17,11 +18,13 @@ const corsOptions = {
   optionsSuccessStatus: 200
 }
 
+
 if (cluster.isPrimary) {
   // flush()
   const uploaderTable = 'uploader';
   const clusterMap = {};
   const totalVoteCount = {};
+
 
   require('./logger').info('Master instance started!');
   flush()
@@ -29,11 +32,14 @@ if (cluster.isPrimary) {
     .catch(err => require('./logger').error('Failed to flush Redis'));
 
 
+
+
   const uploader = {};
   properties.uploaders.forEach(u => uploader[u] = true);
   hsetMassSet(uploaderTable, uploader)
     .then(res => { })
     .catch(err => console.log(err));
+
 
   for (let i = 0; i < numCPUs; i++) {
     const worker = cluster.fork();
@@ -61,6 +67,7 @@ if (cluster.isPrimary) {
     });
   }
 
+
   cluster.on('exit', (worker, code, signal) => {
     require('./logger').info('Labor instance dead...')
   });
@@ -71,25 +78,30 @@ if (cluster.isPrimary) {
     }
   });
 
+
   const app = express();
   const jsonParser = bodyParser.json();
   // app.use(cors(corsOptions));
   app.use('/', express.static(path.join(__dirname, 'public')));
+
 
   app.get('/', async (req, res) => {
     const rc = await hsetMassGet('1pending', 'aaa', 'bbb', 'ccc');
     res.send(JSON.stringify(rc));
   });
 
+
   app.get('/test', async (req, res) => {
     validateContract();
     res.send("OK");
   });
 
+
   app.post('/setUploader', jsonParser, async (req, res) => {
     let result = await setUploaderWithAddress(req.body.address);
     res.send("OK");
   });
+
 
   app.post('/getCampaignResults', jsonParser, async (req, res) => {
     try {
@@ -110,11 +122,13 @@ if (cluster.isPrimary) {
     }
   });
 
+
   app.post('/cast', jsonParser, (req, res) => {
     castVote(req.body.address, req.body.message, req.body.campianId, req.body.signature)
       .then(r => res.send({ res: 'Voted!' }))
       .catch(err => res.status(500).send({ err: err.message }));
   })
+
 
   app.post('/getUserVoteByCampaign', jsonParser, (req, res) => {
     getUserVoteByCampaign(req.body.address, req.body.campianId)
@@ -122,14 +136,17 @@ if (cluster.isPrimary) {
       .catch(err => res.status(500).send(err.message));
   })
 
+
   app.post('/verifyMerkleProof', jsonParser, (req, res) => {
     verifyMerkleProof(req.body.address, req.body.voteHash, req.body.merkleProof, req.body.merkleRoot)
       .then(r => res.send(r))
       .catch(err => res.status(500).send(err.message));
   })
 
+
   app.listen(properties.port, () => {
     require('./logger').info('Labor instance started!')
   });
 }
+
 
