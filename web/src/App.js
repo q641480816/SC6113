@@ -15,6 +15,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { closeToast, openErrorToast } from './redux/feedbackSlice';
 
+
 const theme = createTheme({
   palette: {
     mode: 'light', // or 'dark'
@@ -31,6 +32,7 @@ const theme = createTheme({
   }
 });
 
+
 const App = () => {
   const [address, setAddress] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,14 +40,20 @@ const App = () => {
   const selectedCmpaign = useSelector((state) => state.campaignSlice.selectedCmpaign);
   const wallet = useSelector(state => state.walletSlice.addr);
   const [provider, setProvider] = useState(null);
+  const toastOpen = useSelector(state => state.feedbackSlice.toast.open);
+  const severity = useSelector(state => state.feedbackSlice.toast.severity);
+  const message = useSelector(state => state.feedbackSlice.toast.message);
   const dispatch = useDispatch();
+
 
   useEffect(() => {
     if (!refresh) return;
 
+
     getCampaignList();
     dispatch(setRefresh(false));
   }, [refresh])
+
 
   useEffect(() => {
     if (provider) {
@@ -53,9 +61,11 @@ const App = () => {
     }
   }, [provider])
 
+
   const handleToastClose = (event, reason) => {
     if (reason === 'clickaway') { return; } dispatch(closeToast());
   };
+
 
   const connect = () => {
     if (wallet) return;
@@ -78,6 +88,7 @@ const App = () => {
       })
     }
 
+
     getProvider()
       .then(provider => provider.request({ method: "eth_requestAccounts" }))
       .then(accounts => updateAccount(accounts))
@@ -87,13 +98,26 @@ const App = () => {
       });
   }
 
+
   const handleAccountsChanged = (accounts) => {
     updateAccount(accounts);
   }
 
+
   const updateAccount = (accounts) => {
     dispatch(setWallet(accounts.length === 0 ? '' : accounts[0]));
   }
+
+
+  const getCampaignList = () => {
+    axios.get(`${CONSTANTS.indexer}/getCampaign`)
+      .then(list => dispatch(setCampaignList(list.data)))
+      .catch(err => {
+        dispatch(openErrorToast('Error Getting campaign list'))
+        console.log(err);
+      });
+  }
+
 
   const renderBody = () => {
     if(selectedCmpaign){
@@ -102,6 +126,7 @@ const App = () => {
       return <FindCampaign provider={provider} />;
     }
   }
+
 
   return (
     <ThemeProvider theme={theme} >
@@ -119,14 +144,26 @@ const App = () => {
           </Button>
         </div>
 
+
         <div id="faucetBody">
           {renderBody()}
         </div>
+        <Snackbar open={toastOpen} autoHideDuration={4000} onClose={handleToastClose}>
+          <Alert
+            onClose={handleToastClose}
+            severity={severity}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {message}
+          </Alert>
+        </Snackbar>
 
 
       </div>
     </ThemeProvider>
   );
 }
+
 
 export default App;

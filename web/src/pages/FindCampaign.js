@@ -16,7 +16,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { openErrorToast, openSuccessToast, openWarningToast } from '../redux/feedbackSlice';
 import axios from 'axios';
 
+
 const FindCampaign = (props) => {
+
 
   const wallet = useSelector(state => state.walletSlice.addr);
   const [searchKey, setSearchKey] = useState('');
@@ -25,7 +27,9 @@ const FindCampaign = (props) => {
   const [searchedCampaign, setSearchedCampaign] = useState([]);
   const campaignList = useSelector((state) => state.campaignSlice.campaignList);
 
+
   const dispatch = useDispatch();
+
 
   const submitCampaign = (event) => {
     event.preventDefault();
@@ -47,6 +51,7 @@ const FindCampaign = (props) => {
       .finally(a => setIsCreateFormOpen(false))
   }
 
+
   const openSearch = () => {
     const filtered = campaignList.filter(c => c.metadata.campanyName.toUpperCase().includes(searchKey.toUpperCase())
       || c.metadata.ceoName.toUpperCase().includes(searchKey.toUpperCase()))
@@ -54,6 +59,7 @@ const FindCampaign = (props) => {
     setSearchKey('');
     setIsSearchOpen(true);
   }
+
 
   return (
     <div>
@@ -79,6 +85,36 @@ const FindCampaign = (props) => {
           </div>
         </div>
       </div>
+
+
+      <Dialog
+        open={isCreateFormOpen}
+        // sx={{'& .MuiPaper-root': { backgroundColor: '#1434CB', color: 'white' }}}
+        PaperProps={{
+          component: 'form',
+          onSubmit: (event) => submitCampaign(event),
+        }}
+      >
+        <DialogTitle>Create your Vote Campaign for your CEO</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide CEO name, Comapony name and some description.
+          </DialogContentText>
+          <TextField color="secondary" autoFocus required margin="dense" id="name" name="ceoName" label="CEO Name"
+            type="text" fullWidth variant="standard"
+          />
+          <TextField color="secondary" autoFocus required margin="dense" id="campany" name="campanyName" label="Campany Name"
+            type="text" fullWidth variant="standard"
+          />
+          <TextField color="secondary" autoFocus required margin="dense" id="description" name="description" label="Description Name"
+            type="text" fullWidth variant="standard"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button color="secondary" onClick={() => setIsCreateFormOpen(false)}>Cancel</Button>
+          <Button color="secondary" type="submit">Let go</Button>
+        </DialogActions>
+      </Dialog>
 
 
       <Dialog
@@ -111,5 +147,6 @@ const FindCampaign = (props) => {
     </div>
   );
 }
+
 
 export default FindCampaign;
