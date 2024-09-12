@@ -5,7 +5,9 @@ const { hsetAdd, hgetAll, hsetGet } = require('./redisClient');
 const properties = require('./properties.json');
 const WebSocket = require('ws');
 
+
 let wallet, wsProvider, contract, jsonProvider, tokenContract;
+
 
 const getJsonProvider = () => {
     if (jsonProvider) return jsonProvider;
@@ -13,8 +15,10 @@ const getJsonProvider = () => {
     return jsonProvider;
 }
 
+
 const getWebSocket = () => {
     const ws = new WebSocket(`ws${properties.ssl}://${properties.rpcURL}`);
+
 
     ws.on("close", () => {
         console.log("Disconnected. Reconnecting...");
@@ -23,12 +27,15 @@ const getWebSocket = () => {
         }, 1000);
     });
 
+
     ws.on("error", (error) => {
         console.log("WebSocket error: ", error);
     });
 
+
     return ws;
 }
+
 
 const startListening = () => {
     console.log('Initating connection to RPC...')
@@ -37,10 +44,12 @@ const startListening = () => {
     jsonProvider = new ethers.JsonRpcProvider(`http${properties.ssl}://${properties.rpcURL}`)
     tokenContract = new ethers.Contract(properties.tokenContractAddress, tokenContractABI, wsProvider);
 
+
     // Listen for events
     contract.on("UploaderChange", (address, isAllowed) => {
         console.log(`${address} is set to${isAllowed}`);
     });
+
 
     contract.on("VoteCampaignChange", (campaignId, campaignName, metadata, options, results, isActive) => {
         try {
@@ -58,6 +67,7 @@ const startListening = () => {
             console.log(e)
         }
     });
+
 
     tokenContract.on("FaucetToAddress", (address, timestamp, amount) => {
         try {
@@ -83,6 +93,7 @@ const startListening = () => {
         }
     })
 
+
     wsProvider.on('error', (err) => {
         console.error('WebSocket error:', err);
         // Try to reconnect on error
@@ -90,15 +101,56 @@ const startListening = () => {
     });
 }
 
+
 const reconnect = () => {
     if (contract) { contract.removeAllListeners(); }
     if (tokenContract) { contract.removeAllListeners(); }
     if (wsProvider) { wsProvider.destroy(); }
 
+
     console.log('Reconnecting in 1 seconds...');
     // setTimeout(startListening, 1000);
     startListening();
+}
+
+
+const syncCamping = async () => {
+    try {
+        const provider = getJsonProvider();
+        const contract = new ethers.Contract(properties.votingContractAddress, votingContractABI, provider);
+        const fromBlock = await hsetGet(properties.tables.campaignMap, 'lastCheckedBlock');
+        const block = await provider.getBlockNumber();
+        const campaignEvents = await contract.queryFilter('VoteCampaignChange',
+            Number(fromBlock || properties.deployedBlock), block);
+        const map = {};
+        campaignEvents.forEach(c => {
+            const id = Number(c.args[0]);
+            if (!map[id] || map[id].index < c.index) {
+                map[id] = c;
+            }
+        })
+        const listToRedis = {};
+        Object.values(map).map(c => {
+            listToRedis[Number(c.args[0])] = JSON.stringify({
+                campaignId: Number(c.args[0]),
+                campaignName: c.args[1],
+                metadata: c.args[2],
+                options: c.args[3],
+                results: c.args[4].map(v => Number(v)),
+                isActive: c.args[5]
+            });
+        })
+        if(Object.keys(listToRedis).length > 0){
+            await hsetAdd(properties.tables.campaignMap, listToRedis);
+        }
+        await hsetAdd(properties.tables.campaignMap, 'lastCheckedBlock', block);
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+
 
 }
 
-module.exports = { startListening, reconnect, faucet, syncCamping }
+
+module.exports = { startListening, reconnect, syncCamping }
