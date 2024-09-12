@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "a886e642-ec71-4507-bb51-5a68fb552675",
+		"name": "VotingSystem",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3016276"
+	},
+	"item": [
+		{
+			"name": "startCampain",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Sample\",\r\n    \"options\" : [\"A\", \"B\", \"C\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/startCampaign",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"startCampaign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cast",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"0x4666365259838F50626bcea066B40D4FB6582B95\",\r\n    \"message\" : {\"option\": \"C\"},\r\n    \"campianId\": \"2\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/cast",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"cast"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "setUploader",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"0x30Cfd5b87c356A6C96Dbee4828dA0Cf2FAeb2f59\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/setUploader",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"setUploader"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getCampaignResults",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 4\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/getCampaignResults",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"getCampaignResults"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "endCampaign",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/endCampaign",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"endCampaign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getUserVoteByCampaign",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"0x079552B9B475d8bf3905EEe048432Abedd8cDe68\",\r\n    \"campianId\": \"13\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/getUserVoteByCampaign",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"getUserVoteByCampaign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "verifyMerkleProof",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\" : \"0x93932e9577AD79DB177aDacbA4F7cB7a7f74e123\",\r\n    \"voteHash\": \"b60b1deb677c218dd399175d714dcf04031192fae77223207869032cc0d663bb\",\r\n    \"merkleProof\": [\r\n        \"0xdcb2657e04b4eb67da811e67c8ec91d3490b6fba80721c8849a8a6288b4f180b\",\r\n        \"0x1d53d71d413f3f8ee8680acb5baf4cd67b5454f2ac20caffe728fd4da23e4ed4\",\r\n        \"0x76ac6e081a01b0e8f569b735dce8697e847378772e45d4e2e81b27261578e64b\",\r\n        \"0x33131ffc6578f466800298b3e3c48c72c78b06e77e7a7f03a2c83bd6e472e348\",\r\n        \"0x5a078085284be94de290d3f8da4a6e78f14742b3110c51c52104969eb20d0e7f\",\r\n        \"0xe3df9ded8347b86845ceb7b7c7f00a44b0eab15a554306fa16c1846226d81f97\",\r\n        \"0xfd606fa7ecfedbedbc9702b772175a27decb79a7fcfb1a8309db41697c1feb66\",\r\n        \"0xe57dba52e24858c3b329db668fa622fd3cc67626fc1ff2b220aadf7af78f5059\",\r\n        \"0xcf9f8eb18d81169933ceecc386f29997adc4ef45dc77053b612dd35e41d4e1a5\",\r\n        \"0x4d432ca644c0bb99368ee1cb1a56d346b2a799a253d3857435e75a9dd7870860\",\r\n        \"0xb0b773b8d211c4edbd5708f2783ee605fa669a741868ac26751892ee53458fe3\"\r\n    ],\r\n    \"merkleRoot\": \"0x0d8ffb0a9c323f659be30284deee43d5c25196cdec50df0bae6179d3c40b3f8d\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/verifyMerkleProof",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"verifyMerkleProof"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
